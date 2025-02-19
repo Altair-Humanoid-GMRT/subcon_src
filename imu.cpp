@@ -117,10 +117,10 @@ void IMUControl::imuService(){
   Serial.print("U");
   Serial.print(euler.x());
   Serial.print("G");
-  Serial.print(-euler.z());
-  Serial.print("M");
   Serial.print(-euler.y());
-
+  Serial.print("M");
+  Serial.print(-euler.z());
+  
   /* Send gyro data */
   Serial.print("D");
   Serial.print(-gyro.x());
