@@ -23,6 +23,8 @@ The data is sent in the following format:
 The complete data is sent to the computer via USB Serial with this following format:
 "$U{}G{}M{}D{}I{}Y{}P{}C{}T{}B{}\n"
 
+$ is the initial marker
+\n is the end marker
 {} is the value placeholder
 
 
