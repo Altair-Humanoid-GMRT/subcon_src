@@ -4,9 +4,9 @@
 The `imu.cpp` file contains the implementation of the `IMUControl` class, which is responsible for initializing and servicing the Inertial Measurement Unit (IMU) sensor. Below is a brief explanation of the key functions in this file:
 
 The data is sent in the following format:
-- Orientation data: `U` for x-axis, `G` for y-axis (negated), `M` for z-axis (negated).
-- Gyroscope data: `D` for x-axis (negated), `I` for y-axis (negated), `Y` for z-axis.
-- Linear acceleration data: `P` for x-axis (negated), `C` for y-axis, `T` for z-axis.
+- Orientation data: `U` for x-axis, `G` for y-axis (negated), `M` for z-axis (negated). Orientation data is in the form of euler angle which is the roll, pitch, yaw relative to the fixed frame.
+- Gyroscope data: `D` for x-axis (negated), `I` for y-axis (negated), `Y` for z-axis. Gyroscope data is in the form of velocity angle, rad/s
+- Linear acceleration data: `P` for x-axis (negated), `C` for y-axis, `T` for z-axis. 
 
 ## Button
 
