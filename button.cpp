@@ -28,9 +28,9 @@ void ButtonActionControl::begin(IMUControl* imu_controller) {
   display.drawBitmap(32, 0, ALFAROBI_LOGO, LOGO_HEIGHT, LOGO_WIDTH, WHITE); 
   display.display();
   for (uint8_t i = 0; i < 3; ++i) {
-    display.invertDisplay(true); delay(200);
+    display.invertDisplay(true); delay(100);
     digitalWrite(PIN_BUZZER, HIGH);
-    display.invertDisplay(false); delay(200);
+    display.invertDisplay(false); delay(100);
     digitalWrite(PIN_BUZZER, LOW);
   }
 
@@ -182,7 +182,7 @@ void ButtonActionControl::displayEvent() {
           display_menu = L_2;
           break;
 
-        case BUTTON_D:
+        case BUTTON_RIGHT:
           display_menu = L_1_1;
           break;
       }
@@ -199,11 +199,11 @@ void ButtonActionControl::displayEvent() {
           display_menu = L_1_2;
           break;
 
-        case BUTTON_C:
+        case BUTTON_LEFT:
           display_menu = L_1;
           break;
 
-        case BUTTON_D:
+        case BUTTON_RIGHT:
           display_menu = L_1_1_A;
           break;
       }
@@ -220,9 +220,10 @@ void ButtonActionControl::displayEvent() {
           // button_msg = 2;
           break;
 
-        case BUTTON_C:
+        case BUTTON_LEFT:
 //          display_menu = L_1_1;
           // button_msg = 3;
+          display_menu = L_1_1;
           break;
 
         case BUTTON_D:
@@ -248,11 +249,11 @@ void ButtonActionControl::displayEvent() {
           display_menu = L_1_1;
           break;
 
-        case BUTTON_C:
+        case BUTTON_LEFT:
           display_menu = L_1;
           break;
 
-        case BUTTON_D:
+        case BUTTON_RIGHT:
           display_menu = L_1_2_A;
           break;
       }
@@ -269,9 +270,10 @@ void ButtonActionControl::displayEvent() {
           // button_msg = 6;
           break;
 
-        case BUTTON_C:
+        case BUTTON_LEFT:
 //          display_menu = L_1_2;
           // button_msg = 7;
+          display_menu = L_1_2;
           break;
 
         case BUTTON_D:
@@ -326,7 +328,7 @@ void ButtonActionControl::displayEvent() {
           display_menu = L_1;
           break;
 
-        case BUTTON_D:
+        case BUTTON_RIGHT:
           display_menu = L_4_A;
           break;
 
@@ -359,8 +361,28 @@ void ButtonActionControl::displayEvent() {
 
       case L_1_1_A:
         display.setCursor(0, 0);  display.print("____REGIONAL KRI_____");
+        display.setTextSize(2);
         // display.setCursor(0, 12); display.print(">> [Regional KRI]");
         // display.setCursor(0, 24); display.print(" National KRI");
+        switch(button_msg) {
+          case 1:
+            display.setCursor(0, 12);  display.print("Button A");
+            break;
+          case 2:
+            display.setCursor(0, 12);  display.print("Button B");
+            break;
+          case 3:
+            display.setCursor(0, 12);  display.print("Button C");
+            break;
+          case 4:
+            display.setCursor(0, 12);  display.print("Button D");
+            break;
+          default:
+            display.setCursor(0, 12);  display.print("");
+            break;
+        }
+
+        display.setTextSize(1);
         break;
 
       case L_1_2:
@@ -373,6 +395,25 @@ void ButtonActionControl::displayEvent() {
         display.setCursor(0, 0);  display.print("____NATIONAL KRI_____");
         // display.setCursor(0, 12); display.print(">> [Regional KRI]");
         // display.setCursor(0, 24); display.print(" National KRI");
+        display.setTextSize(2);
+        switch(button_msg) {
+          case 5:
+            display.setCursor(0, 12);  display.print("Button A");
+            break;
+          case 6:
+            display.setCursor(0, 12);  display.print("Button B");
+            break;
+          case 7:
+            display.setCursor(0, 12);  display.print("Button C");
+            break;
+          case 8:
+            display.setCursor(0, 12);  display.print("Button D");
+            break;
+          default:
+            display.setCursor(0, 12);  display.print("");
+            break;
+        }
+        display.setTextSize(1);
         break;
 
       case L_2:
@@ -479,6 +520,7 @@ void ButtonActionControl::send() {
 //  }
   Serial.print('B');
   Serial.print(button_msg);
+  // Serial.print('A');
 
   if(reset) {
     button_msg = 0;
