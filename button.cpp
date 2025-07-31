@@ -519,7 +519,7 @@ void ButtonActionControl::send() {
 //    reset = 2;
 //  }
 // Serial.print('B');
-  Serial.write(button_msg);
+  packet.buttonState =  button_msg;
   // Serial.print('A');
 
   if(reset) {
