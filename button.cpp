@@ -518,8 +518,8 @@ void ButtonActionControl::send() {
 //    Serial.print('A');
 //    reset = 2;
 //  }
-  Serial.print('B');
-  Serial.print(button_msg);
+// Serial.print('B');
+  Serial.write(button_msg);
   // Serial.print('A');
 
   if(reset) {
