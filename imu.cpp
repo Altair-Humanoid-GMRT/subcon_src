@@ -113,7 +113,7 @@ void IMUControl::imuService(){
   gyro  = bno.getVector(Adafruit_BNO055::VECTOR_GYROSCOPE);
   accel = bno.getVector(Adafruit_BNO055::VECTOR_LINEARACCEL);
   
-  /* Send orientation data */
+  /* Send orientation data 
   Serial.print("U");
   Serial.print(euler.x());
   Serial.print("G");
@@ -121,7 +121,7 @@ void IMUControl::imuService(){
   Serial.print("M");
   Serial.print(-euler.z());
   
-  /* Send gyro data */
+  Send gyro data 
   Serial.print("D");
   Serial.print(-gyro.x());
   Serial.print("I");
@@ -129,11 +129,23 @@ void IMUControl::imuService(){
   Serial.print("Y");
   Serial.print(gyro.z());
 
-  /* Send linear acceleration data */
+  Send linear acceleration data 
   Serial.print("P");
   Serial.print(-accel.x());
   Serial.print("C");
   Serial.print(accel.y());
   Serial.print("T");
-  Serial.print(accel.z());
+  Serial.print(accel.z()); */
+
+ packet.roll = euler.x();
+ packet.pitch = -euler.y();
+ packet.yaw = -euler.z();
+  
+ packet.gyroX = -gyro.x();
+ packet.gyroY = -gyro.y();
+ packet.gyroZ = gyro.z();
+  
+ packet.accelX = -accel.x();
+ packet.accelY = accel.y();
+ packet.accelZ = accel.z();
 }
