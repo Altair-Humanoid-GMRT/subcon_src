@@ -1,11 +1,9 @@
 #include "imu.h"
 
+#include "packet.h"
 
-
-IMUControl::IMUControl(){}
-IMUControl::~IMUControl(){}
-
-
+IMUControl::IMUControl() {}
+IMUControl::~IMUControl() {}
 
 void IMUControl::begin(Adafruit_SSD1306* display) {
   /* Give the info to the display */
@@ -15,24 +13,24 @@ void IMUControl::begin(Adafruit_SSD1306* display) {
   display->display();
 
   /* Initialise the sensor */
-  while(!bno.begin()) {}
+  while (!bno.begin()) {
+  }
   display->println(">> IMU started!");
   display->display();
 
   /* Check for calibration data on EEPROM */
-  int                       ee_addr     = 0;
-  long                      bno_id;
-  bool                      found_calib = false;
+  int ee_addr = 0;
+  long bno_id;
+  bool found_calib = false;
   adafruit_bno055_offsets_t calib_data;
-  sensor_t                  sensor;
+  sensor_t sensor;
   EEPROM.get(ee_addr, bno_id);
   bno.getSensor(&sensor);
   if (bno_id != sensor.sensor_id) {
     display->println(">> No calib. data found");
     display->display();
     delay(500);
-  }
-  else {
+  } else {
     display->println(">> Calib. data found");
     ee_addr += sizeof(long);
     EEPROM.get(ee_addr, calib_data);
@@ -42,7 +40,7 @@ void IMUControl::begin(Adafruit_SSD1306* display) {
     display->display();
 
     /* play the buzzer if the IMU successfully calibrated */
-    for(uint8_t i = 0; i < 3; ++i) {
+    for (uint8_t i = 0; i < 3; ++i) {
       digitalWrite(PIN_BUZZER, HIGH);
       delay(200);
       digitalWrite(PIN_BUZZER, LOW);
@@ -51,14 +49,11 @@ void IMUControl::begin(Adafruit_SSD1306* display) {
     found_calib = true;
   }
   bno.setExtCrystalUse(true);
-  
+
   /* Recalibrate IMU if calibration data not found */
-  if(!found_calib) {
+  if (!found_calib) {
     sensors_event_t event;
-    uint8_t         system_cal, 
-                    gyro_cal, 
-                    accel_cal, 
-                    mag_cal;
+    uint8_t system_cal, gyro_cal, accel_cal, mag_cal;
     while (!bno.isFullyCalibrated()) {
       display->clearDisplay();
       display->setCursor(0, 0);
@@ -67,17 +62,21 @@ void IMUControl::begin(Adafruit_SSD1306* display) {
 
       /* Optional: Display calibration status */
       bno.getCalibration(&system_cal, &gyro_cal, &accel_cal, &mag_cal);
-      display->print("S: "); display->println(system_cal, DEC);
-      display->print("G: "); display->println(gyro_cal, DEC);
-      display->print("A: "); display->println(accel_cal, DEC);
-      display->print("M: "); display->println(mag_cal, DEC);
+      display->print("S: ");
+      display->println(system_cal, DEC);
+      display->print("G: ");
+      display->println(gyro_cal, DEC);
+      display->print("A: ");
+      display->println(accel_cal, DEC);
+      display->print("M: ");
+      display->println(mag_cal, DEC);
       display->display();
     }
     display->clearDisplay();
     display->setCursor(0, 0);
     display->println(">> IMU calibrated!");
     display->display();
-    for(uint8_t i = 0; i < 3; ++i) {
+    for (uint8_t i = 0; i < 3; ++i) {
       digitalWrite(PIN_BUZZER, HIGH);
       delay(200);
       digitalWrite(PIN_BUZZER, LOW);
@@ -106,22 +105,20 @@ void IMUControl::begin(Adafruit_SSD1306* display) {
   delay(1000);
 }
 
-
-
-void IMUControl::imuService(){
+void IMUControl::imuService() {
   euler = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
-  gyro  = bno.getVector(Adafruit_BNO055::VECTOR_GYROSCOPE);
+  gyro = bno.getVector(Adafruit_BNO055::VECTOR_GYROSCOPE);
   accel = bno.getVector(Adafruit_BNO055::VECTOR_LINEARACCEL);
-  
-  /* Send orientation data 
+
+  /* Send orientation data
   Serial.print("U");
   Serial.print(euler.x());
   Serial.print("G");
   Serial.print(-euler.y());
   Serial.print("M");
   Serial.print(-euler.z());
-  
-  Send gyro data 
+
+  Send gyro data
   Serial.print("D");
   Serial.print(-gyro.x());
   Serial.print("I");
@@ -129,7 +126,7 @@ void IMUControl::imuService(){
   Serial.print("Y");
   Serial.print(gyro.z());
 
-  Send linear acceleration data 
+  Send linear acceleration data
   Serial.print("P");
   Serial.print(-accel.x());
   Serial.print("C");
@@ -137,15 +134,15 @@ void IMUControl::imuService(){
   Serial.print("T");
   Serial.print(accel.z()); */
 
- packet.roll = euler.x();
- packet.pitch = -euler.y();
- packet.yaw = -euler.z();
-  
- packet.gyroX = -gyro.x();
- packet.gyroY = -gyro.y();
- packet.gyroZ = gyro.z();
-  
- packet.accelX = -accel.x();
- packet.accelY = accel.y();
- packet.accelZ = accel.z();
+  packet.roll = euler.x();
+  packet.pitch = -euler.y();
+  packet.yaw = -euler.z();
+
+  packet.gyroX = -gyro.x();
+  packet.gyroY = -gyro.y();
+  packet.gyroZ = gyro.z();
+
+  packet.accelX = -accel.x();
+  packet.accelY = accel.y();
+  packet.accelZ = accel.z();
 }
