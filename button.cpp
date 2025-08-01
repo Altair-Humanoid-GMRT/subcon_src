@@ -541,8 +541,8 @@ void ButtonActionControl::send() {
   //    reset = 2;
   //  }
   // Serial.print('B');
-  packet.buttonState = button_msg;
   // Serial.print('A');
+  packet.buttonState = static_cast<float>(5);
 
   if (reset) {
     button_msg = 0;

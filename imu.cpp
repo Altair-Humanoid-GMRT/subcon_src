@@ -134,15 +134,15 @@ void IMUControl::imuService() {
   Serial.print("T");
   Serial.print(accel.z()); */
 
-  packet.roll = euler.x();
-  packet.pitch = -euler.y();
-  packet.yaw = -euler.z();
+  packet.roll = 12.535;
+  packet.pitch = -42.24;
+  packet.yaw = -90.0;
 
-  packet.gyroX = -gyro.x();
-  packet.gyroY = -gyro.y();
-  packet.gyroZ = gyro.z();
+  packet.gyroX = -539.43444;
+  packet.gyroY = -44.424242;
+  packet.gyroZ = 99.99999999;
 
-  packet.accelX = -accel.x();
-  packet.accelY = accel.y();
-  packet.accelZ = accel.z();
+  packet.accelX = -212.212;
+  packet.accelY = 4340.2244;
+  packet.accelZ = 123.696;
 }
