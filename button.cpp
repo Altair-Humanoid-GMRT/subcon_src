@@ -1,12 +1,10 @@
 #include "button.h"
 
-
+#include "packet.h"
 
 /* -------------- ButtonActionControl Scope ---------------- */
-ButtonActionControl::ButtonActionControl()  {}
+ButtonActionControl::ButtonActionControl() {}
 ButtonActionControl::~ButtonActionControl() {}
-
-
 
 void ButtonActionControl::begin(IMUControl* imu_controller) {
   /* pinmoding */
@@ -17,7 +15,7 @@ void ButtonActionControl::begin(IMUControl* imu_controller) {
   pinMode(PIN_MUX, INPUT);
 
   /* start display */
-  while(!display.begin(SSD1306_SWITCHCAPVCC, OLED_ADDR)) {
+  while (!display.begin(SSD1306_SWITCHCAPVCC, OLED_ADDR)) {
     Serial.println(F("Retrying the display..."));
   }
   display.setTextColor(WHITE);
@@ -25,12 +23,14 @@ void ButtonActionControl::begin(IMUControl* imu_controller) {
   display.clearDisplay();
 
   /* splash screen */
-  display.drawBitmap(32, 0, ALFAROBI_LOGO, LOGO_HEIGHT, LOGO_WIDTH, WHITE); 
+  display.drawBitmap(32, 0, ALFAROBI_LOGO, LOGO_HEIGHT, LOGO_WIDTH, WHITE);
   display.display();
   for (uint8_t i = 0; i < 3; ++i) {
-    display.invertDisplay(true); delay(100);
+    display.invertDisplay(true);
+    delay(100);
     digitalWrite(PIN_BUZZER, HIGH);
-    display.invertDisplay(false); delay(100);
+    display.invertDisplay(false);
+    delay(100);
     digitalWrite(PIN_BUZZER, LOW);
   }
 
@@ -38,11 +38,9 @@ void ButtonActionControl::begin(IMUControl* imu_controller) {
   imu_controller->begin(&display);
 }
 
-
-
 void ButtonActionControl::buttonEvent() {
   /* debouncing */
-  if(millis() - debounce_time > DEBOUNCE_MS) {
+  if (millis() - debounce_time > DEBOUNCE_MS) {
     /* false counter for buzzer sound */
     uint8_t button_pressed_cnt = 0;
 
@@ -52,100 +50,89 @@ void ButtonActionControl::buttonEvent() {
       digitalWrite(PIN_S1, HIGH && (i & B00000010));
       digitalWrite(PIN_S2, HIGH && (i & B00000100));
       button_state[i] = (analogRead(PIN_MUX) < 100) ? true : false;
-      button_pressed_cnt = (button_state[i]) ? button_pressed_cnt + 1 : button_pressed_cnt;
+      button_pressed_cnt =
+          (button_state[i]) ? button_pressed_cnt + 1 : button_pressed_cnt;
     }
 
     /* button latching control */
-    if(button_pressed_cnt > 0 && !button_down) {
+    if (button_pressed_cnt > 0 && !button_down) {
       /* play buzzer */
       digitalWrite(PIN_BUZZER, HIGH);
       button_down = true;
 
       /* time control */
       start_time = millis();
-      hold_time  = start_time;
-    }
-    else if(button_pressed_cnt == 0) {
+      hold_time = start_time;
+    } else if (button_pressed_cnt == 0) {
       /* stop buzzer */
       digitalWrite(PIN_BUZZER, LOW);
       button_down = false;
-      if(button_msg != 0) {
+      if (button_msg != 0) {
         reset = true;
       }
     }
 
     /* button pressed */
-    else if(button_down) {
+    else if (button_down) {
       /* take time diff */
       uint64_t time_diff = hold_time - start_time;
 
       /* take button action */
-      if(time_diff == 0) {
+      if (time_diff == 0) {
         /* take button action */
-        if      (button_state[UP_ARROW]) {
+        if (button_state[UP_ARROW]) {
           button_action = BUTTON_UP;
-//          button_msg    = "^";
-        }
-        else if (button_state[RIGHT_ARROW]) {
+          //          button_msg    = "^";
+        } else if (button_state[RIGHT_ARROW]) {
           button_action = BUTTON_RIGHT;
-//          button_msg    = ">";
-        }
-        else if (button_state[DOWN_ARROW]) {
+          //          button_msg    = ">";
+        } else if (button_state[DOWN_ARROW]) {
           button_action = BUTTON_DOWN;
-//          button_msg    = "v";
-        }
-        else if (button_state[LEFT_ARROW]) {
+          //          button_msg    = "v";
+        } else if (button_state[LEFT_ARROW]) {
           button_action = BUTTON_LEFT;
-//          button_msg    = "<";
-        }
-        else if (button_state[A_BUTTON]) {
+          //          button_msg    = "<";
+        } else if (button_state[A_BUTTON]) {
           button_action = BUTTON_A;
-          if(display_menu == L_1_1_A) {
+          if (display_menu == L_1_1_A) {
             button_msg = 1;
-          }
-          else if(display_menu == L_1_2_A) {
+          } else if (display_menu == L_1_2_A) {
             button_msg = 5;
           }
-//          button_msg    = 1;
-//          reset         = 0;
-        }
-        else if (button_state[B_BUTTON]) {
+          //          button_msg    = 1;
+          //          reset         = 0;
+        } else if (button_state[B_BUTTON]) {
           button_action = BUTTON_B;
-          if(display_menu == L_1_1_A) {
+          if (display_menu == L_1_1_A) {
             button_msg = 2;
-          }else if(display_menu == L_1_2_A) {
+          } else if (display_menu == L_1_2_A) {
             button_msg = 6;
           }
-//          button_msg    = 2;
-//          reset         = 0;
-        }
-        else if (button_state[C_BUTTON]) {
+          //          button_msg    = 2;
+          //          reset         = 0;
+        } else if (button_state[C_BUTTON]) {
           button_action = BUTTON_C;
-          if(display_menu == L_1_1_A) {
+          if (display_menu == L_1_1_A) {
             button_msg = 3;
-          }
-          else if(display_menu == L_1_2_A) {
+          } else if (display_menu == L_1_2_A) {
             button_msg = 7;
           }
-//          button_msg    = 3;
-//          reset         = 0;
-        }
-        else if (button_state[D_BUTTON]) {
+          //          button_msg    = 3;
+          //          reset         = 0;
+        } else if (button_state[D_BUTTON]) {
           button_action = BUTTON_D;
-          if(display_menu == L_1_1_A) {
+          if (display_menu == L_1_1_A) {
             button_msg = 4;
-          }
-          else if(display_menu == L_1_2_A) {
+          } else if (display_menu == L_1_2_A) {
             button_msg = 8;
           }
-//          button_msg    = 4;
-//          reset         = 0;
+          //          button_msg    = 4;
+          //          reset         = 0;
         }
-      }
-      else if(time_diff > BUTTON_HOLD_MS) {
+      } else if (time_diff > BUTTON_HOLD_MS) {
         /* restart time */
         start_time = millis();
-        hold_time  = start_time;
+        hold_time = start_time;
 
         /* reset debouncer */
         debounce_time = millis();
@@ -161,19 +148,17 @@ void ButtonActionControl::buttonEvent() {
   }
 }
 
-
-
 void ButtonActionControl::displayEvent() {
   /* get the button action */
-  if(button_action != BUTTON_NONE) {
+  if (button_action != BUTTON_NONE) {
     refresh_display = true;
   }
 
   /* button action */
-  switch(display_menu) {
+  switch (display_menu) {
     case L_1:
       /* process the button input */
-      switch(button_action) {
+      switch (button_action) {
         case BUTTON_UP:
           display_menu = L_4;
           break;
@@ -190,7 +175,7 @@ void ButtonActionControl::displayEvent() {
 
     case L_1_1:
       /* process the button input */
-      switch(button_action) {
+      switch (button_action) {
         case BUTTON_UP:
           display_menu = L_1_2;
           break;
@@ -211,7 +196,7 @@ void ButtonActionControl::displayEvent() {
 
     case L_1_1_A:
       /* process the button input */
-      switch(button_action) {
+      switch (button_action) {
         case BUTTON_A:
           // button_msg = 1;
           break;
@@ -221,7 +206,7 @@ void ButtonActionControl::displayEvent() {
           break;
 
         case BUTTON_LEFT:
-//          display_menu = L_1_1;
+          //          display_menu = L_1_1;
           // button_msg = 3;
           display_menu = L_1_1;
           break;
@@ -229,18 +214,18 @@ void ButtonActionControl::displayEvent() {
         case BUTTON_D:
           // button_msg = 4;
           break;
-         case BUTTON_NONE:
+        case BUTTON_NONE:
           // button_msg = 5;
           break;
-         default:
-//          button_msg = 0;
+        default:
+          //          button_msg = 0;
           break;
       }
       break;
 
     case L_1_2:
       /* process the button input */
-      switch(button_action) {
+      switch (button_action) {
         case BUTTON_UP:
           display_menu = L_1_1;
           break;
@@ -261,7 +246,7 @@ void ButtonActionControl::displayEvent() {
 
     case L_1_2_A:
       /* process the button input */
-      switch(button_action) {
+      switch (button_action) {
         case BUTTON_A:
           // button_msg = 5;
           break;
@@ -271,7 +256,7 @@ void ButtonActionControl::displayEvent() {
           break;
 
         case BUTTON_LEFT:
-//          display_menu = L_1_2;
+          //          display_menu = L_1_2;
           // button_msg = 7;
           display_menu = L_1_2;
           break;
@@ -279,15 +264,15 @@ void ButtonActionControl::displayEvent() {
         case BUTTON_D:
           // button_msg = 8;
           break;
-         default:
-//          button_msg = 0;
+        default:
+          //          button_msg = 0;
           break;
       }
       break;
 
     case L_2:
       /* process the button input */
-      switch(button_action) {
+      switch (button_action) {
         case BUTTON_UP:
           display_menu = L_1;
           break;
@@ -303,7 +288,7 @@ void ButtonActionControl::displayEvent() {
 
     case L_3:
       /* process the button input */
-      switch(button_action) {
+      switch (button_action) {
         case BUTTON_UP:
           display_menu = L_2;
           break;
@@ -316,10 +301,10 @@ void ButtonActionControl::displayEvent() {
           break;
       }
       break;
-    
+
     case L_4:
       /* process the button input */
-      switch(button_action) {
+      switch (button_action) {
         case BUTTON_UP:
           display_menu = L_3;
           break;
@@ -340,45 +325,59 @@ void ButtonActionControl::displayEvent() {
   button_action = BUTTON_NONE;
 
   /* refresh the display as required */
-  if(refresh_display) {
+  if (refresh_display) {
     /* clear the previous display */
     display.clearDisplay();
 
-    switch(display_menu) {
+    switch (display_menu) {
       case L_1:
-        display.setCursor(0, 0);  display.print("______MAIN MENU______");
-        display.setCursor(0, 12); display.print(">> [Match Gameplay]");
-        display.setCursor(0, 24); display.print(" Select Pose");
-        display.setCursor(0, 36); display.print(" Play Sequential");
-        display.setCursor(0, 48); display.print(" Turn Off");
+        display.setCursor(0, 0);
+        display.print("______MAIN MENU______");
+        display.setCursor(0, 12);
+        display.print(">> [Match Gameplay]");
+        display.setCursor(0, 24);
+        display.print(" Select Pose");
+        display.setCursor(0, 36);
+        display.print(" Play Sequential");
+        display.setCursor(0, 48);
+        display.print(" Turn Off");
         break;
 
       case L_1_1:
-        display.setCursor(0, 0);  display.print("___MATCH GAMEPLAY____");
-        display.setCursor(0, 12); display.print(">> [Regional KRI]");
-        display.setCursor(0, 24); display.print(" National KRI");
+        display.setCursor(0, 0);
+        display.print("___MATCH GAMEPLAY____");
+        display.setCursor(0, 12);
+        display.print(">> [Regional KRI]");
+        display.setCursor(0, 24);
+        display.print(" National KRI");
         break;
 
       case L_1_1_A:
-        display.setCursor(0, 0);  display.print("____REGIONAL KRI_____");
+        display.setCursor(0, 0);
+        display.print("____REGIONAL KRI_____");
         display.setTextSize(2);
         // display.setCursor(0, 12); display.print(">> [Regional KRI]");
         // display.setCursor(0, 24); display.print(" National KRI");
-        switch(button_msg) {
+        switch (button_msg) {
           case 1:
-            display.setCursor(0, 12);  display.print("Button A");
+            display.setCursor(0, 12);
+            display.print("Button A");
             break;
           case 2:
-            display.setCursor(0, 12);  display.print("Button B");
+            display.setCursor(0, 12);
+            display.print("Button B");
             break;
           case 3:
-            display.setCursor(0, 12);  display.print("Button C");
+            display.setCursor(0, 12);
+            display.print("Button C");
             break;
           case 4:
-            display.setCursor(0, 12);  display.print("Button D");
+            display.setCursor(0, 12);
+            display.print("Button D");
             break;
           default:
-            display.setCursor(0, 12);  display.print("");
+            display.setCursor(0, 12);
+            display.print("");
             break;
         }
 
@@ -386,63 +385,88 @@ void ButtonActionControl::displayEvent() {
         break;
 
       case L_1_2:
-        display.setCursor(0, 0);  display.print("___MATCH GAMEPLAY____");
-        display.setCursor(0, 12); display.print("Regional KRI");
-        display.setCursor(0, 24); display.print(">> [National KRI]");
+        display.setCursor(0, 0);
+        display.print("___MATCH GAMEPLAY____");
+        display.setCursor(0, 12);
+        display.print("Regional KRI");
+        display.setCursor(0, 24);
+        display.print(">> [National KRI]");
         break;
 
       case L_1_2_A:
-        display.setCursor(0, 0);  display.print("____NATIONAL KRI_____");
+        display.setCursor(0, 0);
+        display.print("____NATIONAL KRI_____");
         // display.setCursor(0, 12); display.print(">> [Regional KRI]");
         // display.setCursor(0, 24); display.print(" National KRI");
         display.setTextSize(2);
-        switch(button_msg) {
+        switch (button_msg) {
           case 5:
-            display.setCursor(0, 12);  display.print("Button A");
+            display.setCursor(0, 12);
+            display.print("Button A");
             break;
           case 6:
-            display.setCursor(0, 12);  display.print("Button B");
+            display.setCursor(0, 12);
+            display.print("Button B");
             break;
           case 7:
-            display.setCursor(0, 12);  display.print("Button C");
+            display.setCursor(0, 12);
+            display.print("Button C");
             break;
           case 8:
-            display.setCursor(0, 12);  display.print("Button D");
+            display.setCursor(0, 12);
+            display.print("Button D");
             break;
           default:
-            display.setCursor(0, 12);  display.print("");
+            display.setCursor(0, 12);
+            display.print("");
             break;
         }
         display.setTextSize(1);
         break;
 
       case L_2:
-        display.setCursor(0, 0);  display.print("______MAIN MENU______");
-        display.setCursor(0, 12); display.print(" Match Gameplay");
-        display.setCursor(0, 24); display.print(">> [Select Pose]");
-        display.setCursor(0, 36); display.print(" Play Sequential");
-        display.setCursor(0, 48); display.print(" Turn Off");
+        display.setCursor(0, 0);
+        display.print("______MAIN MENU______");
+        display.setCursor(0, 12);
+        display.print(" Match Gameplay");
+        display.setCursor(0, 24);
+        display.print(">> [Select Pose]");
+        display.setCursor(0, 36);
+        display.print(" Play Sequential");
+        display.setCursor(0, 48);
+        display.print(" Turn Off");
         break;
 
       case L_3:
-        display.setCursor(0, 0);  display.print("______MAIN MENU______");
-        display.setCursor(0, 12); display.print(" Match Gameplay");
-        display.setCursor(0, 24); display.print(" Select Pose");
-        display.setCursor(0, 36); display.print(">> [Play Sequential]");
-        display.setCursor(0, 48); display.print(" Turn Off");
+        display.setCursor(0, 0);
+        display.print("______MAIN MENU______");
+        display.setCursor(0, 12);
+        display.print(" Match Gameplay");
+        display.setCursor(0, 24);
+        display.print(" Select Pose");
+        display.setCursor(0, 36);
+        display.print(">> [Play Sequential]");
+        display.setCursor(0, 48);
+        display.print(" Turn Off");
         break;
-      
+
       case L_4:
-        display.setCursor(0, 0);  display.print("______MAIN MENU______");
-        display.setCursor(0, 12); display.print(" Match Gameplay");
-        display.setCursor(0, 24); display.print(" Select Pose");
-        display.setCursor(0, 36); display.print(" Play Sequential");
-        display.setCursor(0, 48); display.print(">> [Turn Off]");
+        display.setCursor(0, 0);
+        display.print("______MAIN MENU______");
+        display.setCursor(0, 12);
+        display.print(" Match Gameplay");
+        display.setCursor(0, 24);
+        display.print(" Select Pose");
+        display.setCursor(0, 36);
+        display.print(" Play Sequential");
+        display.setCursor(0, 48);
+        display.print(">> [Turn Off]");
         break;
 
       case L_4_A:
         display.setTextSize(2);
-        display.setCursor(0, 12);  display.print("Turning\noff...");
+        display.setCursor(0, 12);
+        display.print("Turning\noff...");
         break;
     }
 
@@ -452,77 +476,75 @@ void ButtonActionControl::displayEvent() {
   }
 }
 
-
-
 void ButtonActionControl::actionController() {
-//  if(reset) {
-//    button_msg = 0;
-//    Serial.print(button_msg);
-//    reset = false;
-//    return;
-//  }
-  switch(display_menu) {
+  //  if(reset) {
+  //    button_msg = 0;
+  //    Serial.print(button_msg);
+  //    reset = false;
+  //    return;
+  //  }
+  switch (display_menu) {
     case REGIONAL_KRI:
       // Serial.print("mode:"); Serial.println("REGIONAL_KRI");
       // Serial.print("button:"); Serial.println(button_msg);
-//      if(button_action == BUTTON_A) {
-//        button_msg = 1;
-//        reset = 0;
-//      }
-//      else if(button_action == BUTTON_B) {
-//        button_msg = 2;
-//        reset = 0;
-//      }
-//      else if(button_action == BUTTON_C) {
-//        button_msg = 3;
-//        reset = 0;
-//      }
-//      else if(button_action == BUTTON_D) {
-//        button_msg = 4;
-//        reset = 0;
-//      }
+      //      if(button_action == BUTTON_A) {
+      //        button_msg = 1;
+      //        reset = 0;
+      //      }
+      //      else if(button_action == BUTTON_B) {
+      //        button_msg = 2;
+      //        reset = 0;
+      //      }
+      //      else if(button_action == BUTTON_C) {
+      //        button_msg = 3;
+      //        reset = 0;
+      //      }
+      //      else if(button_action == BUTTON_D) {
+      //        button_msg = 4;
+      //        reset = 0;
+      //      }
       break;
 
     case NATIONAL_KRI:
-//      Serial.print("mode:"); Serial.println("NATIONAL_KRI");
-//      Serial.print("button:"); Serial.println(button_msg);
+      //      Serial.print("mode:"); Serial.println("NATIONAL_KRI");
+      //      Serial.print("button:"); Serial.println(button_msg);
       break;
 
     case TURN_OFF:
-//      Serial.print("mode:"); Serial.println("TURN_OFF");
-//      Serial.print("button:"); Serial.println(button_msg);
+      //      Serial.print("mode:"); Serial.println("TURN_OFF");
+      //      Serial.print("button:"); Serial.println(button_msg);
       break;
 
     default:
       // Serial.print("mode:"); Serial.println("_");
       // Serial.print("button:"); Serial.println(button_msg);
-//      button_msg = "0";
+      //      button_msg = "0";
       break;
   }
 }
 
 void ButtonActionControl::send() {
-//  if(reset == 2) {
-//    Serial.print('B');
-//    Serial.print(5);
-//    Serial.print('A');
-//    reset--;
-//  }
-//  else if(reset == 1){
-//    Serial.print('B');
-//    Serial.print('A');
-//  }
-//  else if(reset == 0) {
-//    Serial.print('B');
-//    Serial.print(button_msg);
-//    Serial.print('A');
-//    reset = 2;
-//  }
-// Serial.print('B');
-  packet.buttonState =  button_msg;
+  //  if(reset == 2) {
+  //    Serial.print('B');
+  //    Serial.print(5);
+  //    Serial.print('A');
+  //    reset--;
+  //  }
+  //  else if(reset == 1){
+  //    Serial.print('B');
+  //    Serial.print('A');
+  //  }
+  //  else if(reset == 0) {
+  //    Serial.print('B');
+  //    Serial.print(button_msg);
+  //    Serial.print('A');
+  //    reset = 2;
+  //  }
+  // Serial.print('B');
+  packet.buttonState = button_msg;
   // Serial.print('A');
 
-  if(reset) {
+  if (reset) {
     button_msg = 0;
     reset = false;
   }
@@ -530,8 +552,8 @@ void ButtonActionControl::send() {
 
 void ButtonActionControl::buttonService() {
   /* combine! */
-  this -> buttonEvent();
-  this -> displayEvent();
-  this -> actionController();
-  this -> send();
+  this->buttonEvent();
+  this->displayEvent();
+  this->actionController();
+  this->send();
 }
