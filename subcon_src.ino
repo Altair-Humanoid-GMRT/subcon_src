@@ -1,21 +1,9 @@
 #include "button.h"
 #include "imu.h"
+#include "packet.h"
 
 ButtonActionControl* button = new ButtonActionControl();
 IMUControl* imu_controller  = new IMUControl();
-
-struct SensorPacket {
-  float roll;    // x-axis orientation
-  float pitch;   // y-axis orientation
-  float yaw;     // z-axis orientation
-  float gyroX;
-  float gyroY;
-  float gyroZ;
-  float accelX;
-  float accelY;
-  float accelZ;
-  float buttonState;
-};
 SensorPacket packet;
 
 void setup(){
@@ -34,6 +22,7 @@ void setup(){
 void loop(){
   /* repeat buttonService and imuService */
   Serial.write(0x69);
+
   imu_controller->imuService();
   button -> buttonService();
   
