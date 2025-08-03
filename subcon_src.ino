@@ -14,12 +14,12 @@ void setup(){
   Serial.begin(115200);
 
   /* set I2C interface */
-  Wire.setSDA(PB9);
-  Wire.setSCL(PB8);
-  Wire.begin();  
+  // Wire.setSDA(PB9);
+  // Wire.setSCL(PB8);
+  // Wire.begin();  
   
   /* initialize button and imu */
-  button -> begin(imu_controller);
+  // button -> begin(imu_controller);
 }
 
 void loop(){
