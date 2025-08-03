@@ -1,6 +1,7 @@
 #include "button.h"
 
 #include "packet.h"
+extern SensorPacket packet;
 
 /* -------------- ButtonActionControl Scope ---------------- */
 ButtonActionControl::ButtonActionControl() {}

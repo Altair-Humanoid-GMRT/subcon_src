@@ -1,4 +1,4 @@
-struct __attribute__((packed)) SensorPacket {
+struct SensorPacket {
   float roll;    // x-axis orientation
   float pitch;   // y-axis orientation
   float yaw;     // z-axis orientation

@@ -1,6 +1,7 @@
 #include "imu.h"
 
 #include "packet.h"
+extern SensorPacket packet;
 
 IMUControl::IMUControl() {}
 IMUControl::~IMUControl() {}
