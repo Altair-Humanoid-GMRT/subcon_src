@@ -13,12 +13,12 @@ void setup(){
   /* start serial */
   Serial.begin(115200);
 
-  /* set I2C interface */
+  // /* set I2C interface */
   // Wire.setSDA(PB9);
   // Wire.setSCL(PB8);
   // Wire.begin();  
   
-  /* initialize button and imu */
+  // /* initialize button and imu */
   // button -> begin(imu_controller);
 }
 
@@ -29,11 +29,22 @@ void loop(){
   unsigned long currentTime = millis();
 
   if (currentTime - lastTime >= period) {
-    Serial.write(0x69);
+    
     imu_controller->imuService();
     button -> buttonService();
-    Serial.write((uint8_t*)&packet, sizeof(packet));
-    Serial.write(0x96);
+    
+    uint8_t checksum = 0;
+    uint8_t* data = (uint8_t*)&packet;
+
+    Serial.write(0xFF);
+    Serial.write(0xFF);
+    Serial.write(sizeof(SensorPacket) + 1);
+    for (size_t i = 0; i < sizeof(SensorPacket); i++) {
+      Serial.write(data[i]);
+      checksum += data[i];
+    }
+    checksum = ~checksum;
+    Serial.write(checksum);
 
     lastTime = currentTime;
   }
