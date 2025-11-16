@@ -135,15 +135,19 @@ void IMUControl::imuService() {
   Serial.print("T");
   Serial.print(accel.z()); */
 
-  packet.roll = euler.x();
-  packet.pitch = -euler.y();
-  packet.yaw = -euler.z();
+    /* Convert from BNO055 convention (+X right, +Y forward, +Z up)
+     to NWU convention (+X forward, +Y left, +Z up) */
 
-  packet.gyroX = -gyro.x();
-  packet.gyroY = -gyro.y();
+  packet.roll = euler.y();
+  packet.pitch = -euler.x();
+  packet.yaw = euler.z();
+
+  packet.gyroX =  gyro.y();  
+  packet.gyroY = -accel.x();  
   packet.gyroZ = gyro.z();
 
-  packet.accelX = -accel.x();
-  packet.accelY = accel.y();
-  packet.accelZ = accel.z();
+  packet.accelX = accel.y(); 
+  packet.accelY = -accel.x(); 
+  packet.accelZ = accel.z();    
 }
+
