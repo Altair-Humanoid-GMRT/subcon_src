@@ -1,7 +1,9 @@
+#pragma pack(push, 1)
 struct SensorPacket {
-  float roll;    // x-axis orientation
-  float pitch;   // y-axis orientation
-  float yaw;     // z-axis orientation
+  float x;
+  float y;
+  float z;
+  float w;
   float gyroX;
   float gyroY;
   float gyroZ;
@@ -10,3 +12,4 @@ struct SensorPacket {
   float accelZ;
   float buttonState;
 };
+#pragma pack(pop)
