@@ -21,7 +21,7 @@ private:
 
   /* members */
   Adafruit_BNO055 bno = Adafruit_BNO055(55);
-  imu::Vector<3> euler;
+  imu::Quaternion quat;
   imu::Vector<3> gyro;
   imu::Vector<3> accel;
 
@@ -36,6 +36,7 @@ public:
   void begin(Adafruit_SSD1306* display);
   void imuService();
 };
+
 
 
 #endif
