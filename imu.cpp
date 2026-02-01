@@ -49,6 +49,9 @@ void IMUControl::begin(Adafruit_SSD1306* display) {
     }
     found_calib = true;
   }
+  // if needed, remap the axis, follow this datasheet page 27 (https://www.bosch-sensortec.com/media/boschsensortec/downloads/datasheets/bst-bno055-ds000.pdf)
+  // bno.setAxisRemap(Adafruit_BNO055::REMAP_CONFIG_P0);
+  // bno.setAxisSign(Adafruit_BNO055::REMAP_SIGN_P0);
   bno.setExtCrystalUse(true);
 
   /* Recalibrate IMU if calibration data not found */
@@ -107,47 +110,22 @@ void IMUControl::begin(Adafruit_SSD1306* display) {
 }
 
 void IMUControl::imuService() {
-  euler = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
+  quat = bno.getQuat();
   gyro = bno.getVector(Adafruit_BNO055::VECTOR_GYROSCOPE);
   accel = bno.getVector(Adafruit_BNO055::VECTOR_LINEARACCEL);
 
-  /* Send orientation data
-  Serial.print("U");
-  Serial.print(euler.x());
-  Serial.print("G");
-  Serial.print(-euler.y());
-  Serial.print("M");
-  Serial.print(-euler.z());
+  packet.x = (float)quat.x();
+  packet.y = (float)quat.y();
+  packet.z = (float)quat.z();
+  packet.w = (float)quat.w();
 
-  Send gyro data
-  Serial.print("D");
-  Serial.print(-gyro.x());
-  Serial.print("I");
-  Serial.print(-gyro.y());
-  Serial.print("Y");
-  Serial.print(gyro.z());
+  packet.gyroX = (float)gyro.x();  
+  packet.gyroY = (float)gyro.y();  
+  packet.gyroZ = (float)gyro.z();
 
-  Send linear acceleration data
-  Serial.print("P");
-  Serial.print(-accel.x());
-  Serial.print("C");
-  Serial.print(accel.y());
-  Serial.print("T");
-  Serial.print(accel.z()); */
-
-    /* Convert from BNO055 convention (+X right, +Y forward, +Z up)
-     to NWU convention (+X forward, +Y left, +Z up) */
-
-  packet.roll = euler.y();
-  packet.pitch = -euler.x();
-  packet.yaw = euler.z();
-
-  packet.gyroX =  gyro.y();  
-  packet.gyroY = -accel.x();  
-  packet.gyroZ = gyro.z();
-
-  packet.accelX = accel.y(); 
-  packet.accelY = -accel.x(); 
-  packet.accelZ = accel.z();    
+  packet.accelX = (float)accel.x(); 
+  packet.accelY = (float)accel.y(); 
+  packet.accelZ = (float)accel.z();    
 }
+
 
